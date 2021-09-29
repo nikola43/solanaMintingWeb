@@ -29,13 +29,13 @@ h6 {
   font-family: "PressStart2P-Regular", Fallback, sans-serif !important;
 }
 
-.MuiInput-input, .MuiInputLabel-root {
+.MuiInput-input,
+.MuiInputLabel-root {
   font-family: "PressStart2P-Regular", Fallback, sans-serif !important;
 }
 
 .MuiDialog-paper {
   border-radius: 16px !important;
-
 }
 
 p {
@@ -56,19 +56,17 @@ ul ol {
   font-size: 0.8rem !important;
 }
 
-
 @keyframes gradient {
-	0% {
-		background-position: 0% 50%;
-	}
-	50% {
-		background-position: 100% 50%;
-	}
-	100% {
-		background-position: 0% 50%;
-	}
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
 }
-
 
 .backgroundGradient {
   background-image: linear-gradient(

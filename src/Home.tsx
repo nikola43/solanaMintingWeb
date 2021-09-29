@@ -7,18 +7,18 @@ import React from "react";
 import Collection from "./components/Collection";
 import Nav from "./components/Nav";
 import * as anchor from "@project-serum/anchor";
-import Modal from 'react-modal';
+import Modal from "react-modal";
 import { LAMPORTS_PER_SOL } from "@solana/web3.js";
 
 import { useAnchorWallet } from "@solana/wallet-adapter-react";
 import { WalletDialogButton } from "@solana/wallet-adapter-material-ui";
-import Typography from '@mui/material/Typography';
-import DialogTitle from '@mui/material/DialogTitle';
-import Dialog from '@mui/material/Dialog';
-import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
-import TextField from '@mui/material/TextField';
-import DialogActions from '@mui/material/DialogActions';
+import Typography from "@mui/material/Typography";
+import DialogTitle from "@mui/material/DialogTitle";
+import Dialog from "@mui/material/Dialog";
+import DialogContent from "@mui/material/DialogContent";
+import DialogContentText from "@mui/material/DialogContentText";
+import TextField from "@mui/material/TextField";
+import DialogActions from "@mui/material/DialogActions";
 import {
   CandyMachine,
   awaitTransactionSignatureConfirmation,
@@ -45,20 +45,16 @@ export interface HomeProps {
   txTimeout: number;
 }
 
-
 let subtitle: any;
 
-
-const ComponentDidMount = () => {
-
-}
+const ComponentDidMount = () => { };
 
 const Home = (props: HomeProps) => {
   const [balance, setBalance] = useState<number>();
   const [isActive, setIsActive] = useState(false); // true when countdown completes
   const [isSoldOut, setIsSoldOut] = useState(false); // true when items remaining is zero
   const [isMinting, setIsMinting] = useState(false); // true when user got to press MINT
-
+  const [mintNumber, setMintNumber] = useState([] as any);
   const [alertState, setAlertState] = useState<AlertState>({
     open: false,
     message: "",
@@ -73,9 +69,9 @@ const Home = (props: HomeProps) => {
   const [candyMachine, setCandyMachine] = useState<CandyMachine>();
 
   const connectButtonClick = async () => {
-    const b = document.getElementById("connectButton")
+    const b = document.getElementById("connectButton");
     b?.click();
-  }
+  };
 
   const [modalIsOpen, setIsOpen] = React.useState(false);
 
@@ -84,32 +80,26 @@ const Home = (props: HomeProps) => {
   }
 
   function afterOpenModal() {
-    subtitle.style.color = '#f00';
+    subtitle.style.color = "#f00";
   }
 
   function closeModal() {
     setIsOpen(false);
   }
 
-
   const onMint = async () => {
     try {
       setIsMinting(true);
       if (wallet && candyMachine?.program) {
 
-        let v = document.getElementById("mintamount")
-
-        if (v) {
-          const l = document.getElementById("mintamount")?.innerText;
-          console.log(l)
-        }
+        console.log(mintNumber);
 
         const mintTxId = await mintOneToken(
           candyMachine,
           props.config,
           wallet.publicKey,
           props.treasury,
-          1
+          mintNumber
         );
 
         const status = await awaitTransactionSignatureConfirmation(
@@ -173,14 +163,10 @@ const Home = (props: HomeProps) => {
 
   useEffect(() => {
     const interval = setInterval(() => {
-      console.log('This will run every second!');
-
-
-
+      console.log("This will run every second!");
     }, 1000);
     return () => clearInterval(interval);
   }, []);
-
 
   useEffect(() => {
     (async () => {
@@ -218,7 +204,6 @@ const Home = (props: HomeProps) => {
   };
   window.addEventListener("scroll", changeNavbarColor);
 
-
   const [open, setOpen] = React.useState(false);
   const handleClickOpen = () => {
     setOpen(true);
@@ -228,20 +213,16 @@ const Home = (props: HomeProps) => {
     setOpen(false);
   };
 
-
-
-
   return (
     <main>
       <div>
         <Dialog className="text-center" open={open} onClose={handleClose}>
           <DialogTitle>Mint Ramdom NFT</DialogTitle>
-          <DialogContent >
-
+          <DialogContent>
             <img
               id="ramdomBaby"
               loading="lazy"
-              src="http://babypunks.com/img/baby_3.png"
+              src="https://s3.eu-central-1.wasabisys.com/steleros/gif_1.gif"
               style={{ borderRadius: "16px" }}
               alt="header"
             />
@@ -252,17 +233,24 @@ const Home = (props: HomeProps) => {
               id="mintamount"
               label="Mint amount"
               type="number"
+              InputProps={{
+                inputProps: {
+                  max: 20,
+                  min: 1,
+                },
+              }}
               fullWidth
               variant="standard"
+              value={mintNumber}
+              onChange={(e) => setMintNumber(e.target.value)}
             />
 
-
             <div>
-
               {isMinting ? (
                 <CircularProgress />
               ) : (
-                <img onClick={wallet ? onMint : connectButtonClick}
+                <img
+                  onClick={wallet ? onMint : connectButtonClick}
                   className="randomImage"
                   loading="lazy"
                   id="random"
@@ -314,11 +302,7 @@ const Home = (props: HomeProps) => {
                           </a>
                         </li>
                         <li className="menu-item-has-children">
-                          <a
-                            title="roadmap"
-                            href="#roadmap"
-                            data-scroll="true"
-                          >
+                          <a title="roadmap" href="#roadmap" data-scroll="true">
                             Roadmap
                           </a>
                         </li>
@@ -363,11 +347,7 @@ const Home = (props: HomeProps) => {
                           </a>
                         </li>
                         <li className="menu-item-has-children">
-                          <a
-                            title="Roadmap"
-                            href="#roadmap"
-                            data-scroll="true"
-                          >
+                          <a title="Roadmap" href="#roadmap" data-scroll="true">
                             Roadmap
                           </a>
                         </li>
@@ -481,16 +461,18 @@ const Home = (props: HomeProps) => {
 
                     <li>
                       {!wallet && (
-                        <ConnectButton id="connectButton">
-                        </ConnectButton>
+                        <ConnectButton id="connectButton"></ConnectButton>
                       )}
 
                       {wallet && (
-                        <div className="connectedLabelDiv"><p className="connectedLabel">Connected: {shortenAddress(wallet.publicKey.toBase58() || "")}</p></div>
+                        <div className="connectedLabelDiv">
+                          <p className="connectedLabel">
+                            Connected:{" "}
+                            {shortenAddress(wallet.publicKey.toBase58() || "")}
+                          </p>
+                        </div>
                       )}
                     </li>
-
-
 
                     {/* <button
                         // onClick={() => setShowModal(true)}
@@ -528,28 +510,33 @@ const Home = (props: HomeProps) => {
                   </div>
                   <div className="row" id="MINT">
                     <div className="col-lg-7 col-md-12 col-lg-offset-0 col-sm-12 col-xs-12">
-                      <div style={{ marginBottom: "130px", textAlign: "center" }}>
-                        <h3 style={{ marginTop: "1rem", textAlign: "center" }} >10,000 unique BabyPunks live on Solana</h3>
+                      <div
+                        style={{ marginBottom: "130px", textAlign: "center" }}
+                      >
+                        <h3 style={{ marginTop: "1rem", textAlign: "center" }}>
+                          10,000 unique BabyPunks live on Solana
+                        </h3>
 
                         <p>
                           BabyPunks is a limited NFT collection on the Solana
-                          blockchain.Supply is capped at 10,000.Your BabyPunks allow
-                          you to earn 5% royalties paid in SOL tokens from every buy &
-                          sell for life.
+                          blockchain.Supply is capped at 10,000.Your BabyPunks
+                          allow you to earn 5% royalties paid in SOL tokens from
+                          every buy & sell for life.
                         </p>
 
                         <p>
-                          All BabyPunks are programmatically generated to include
-                          numerous traits and rarity.Adopting a BabyPunk also gives
-                          you access to features within our BabyPunk Arcade which will
-                          feature a series of old school classic games similar to
-                          Tetris, Flappy Bird, and more.
+                          All BabyPunks are programmatically generated to
+                          include numerous traits and rarity.Adopting a BabyPunk
+                          also gives you access to features within our BabyPunk
+                          Arcade which will feature a series of old school
+                          classic games similar to Tetris, Flappy Bird, and
+                          more.
                         </p>
 
                         <p>
-                          All BabyPunks will be revealed shortly after being minted
-                          along with activating special community features based on
-                          the roadmap.
+                          All BabyPunks will be revealed shortly after being
+                          minted along with activating special community
+                          features based on the roadmap.
                         </p>
                       </div>
                     </div>
@@ -559,10 +546,11 @@ const Home = (props: HomeProps) => {
                           className="randomImage"
                           loading="lazy"
                           id="random"
-                          src="http://babypunks.com/img/random/2.png"
+                          src="https://s3.eu-central-1.wasabisys.com/steleros/gif_2.gif"
                           alt="random nft"
                         />
-                        <img onClick={handleClickOpen}
+                        <img
+                          onClick={handleClickOpen}
                           className="randomImage mt-1"
                           loading="lazy"
                           id="random"
@@ -577,62 +565,77 @@ const Home = (props: HomeProps) => {
                 <div className="row">
                   <div className="col-lg-5 col-md-12 col-lg-offset-0 col-sm-12 col-xs-12">
                     <div className="widget w-distribution-ends">
-                      <img loading="lazy" id="random2" src="http://babypunks.com/img/baby_illustration.png"
-                        alt="babypunk ilustration" />
+                      <img
+                        loading="lazy"
+                        id="random2"
+                        src="http://babypunks.com/img/baby_illustration.png"
+                        alt="babypunk ilustration"
+                      />
                     </div>
                   </div>
                   <div className="col-lg-7 col-md-12 col-lg-offset-0 col-sm-12 col-xs-12">
                     <div style={{ marginBottom: "130px" }}>
-
-                      <h6>These pixel babies are not your average crypto NFT.</h6>
+                      <h6>
+                        These pixel babies are not your average crypto NFT.
+                      </h6>
 
                       <p>
-                        BabyPunks is a limited NFT collection on the Solana blockchain. Supply is capped at
-                        10,000. Your BabyPunks allow you to earn 5% royalties paid in SOL tokens from every buy
-                        & sell for life.
+                        BabyPunks is a limited NFT collection on the Solana
+                        blockchain. Supply is capped at 10,000. Your BabyPunks
+                        allow you to earn 5% royalties paid in SOL tokens from
+                        every buy & sell for life.
                       </p>
 
                       <p>
-                        All BabyPunks are algorithmically generated from X amount of traits. Adopting a BabyPunk
-                        also gives you access to features within our BabyPunk Arcade which will feature a series
-                        of old school classic games similar to Tetris, Flappy Bird, and more.
+                        All BabyPunks are algorithmically generated from X
+                        amount of traits. Adopting a BabyPunk also gives you
+                        access to features within our BabyPunk Arcade which will
+                        feature a series of old school classic games similar to
+                        Tetris, Flappy Bird, and more.
                       </p>
 
                       <p>
-                        All BabyPunks will be revealed shortly after being minted along with activating special
-                        community features based on the roadmap.
+                        All BabyPunks will be revealed shortly after being
+                        minted along with activating special community features
+                        based on the roadmap.
                       </p>
                     </div>
                   </div>
                 </div>
-
               </div>
             </section>
 
             <section>
               <div id="" className="container text-center">
                 <div className="col-md-12 col-sm-12 col-xs-12 mb-2">
-                  <h1>
-                    The Story
-                  </h1>
+                  <h1>The Story</h1>
                 </div>
                 <div className="row text-center" id="story">
                   <div className="row mb-5">
-                    <img loading="lazy" src="http://babypunks.com/img/banner2.png" alt="storyImage" />
+                    <img
+                      loading="lazy"
+                      src="http://babypunks.com/img/banner2.png"
+                      alt="storyImage"
+                    />
                   </div>
                   <div className="col-md-12 col-sm-12 col-xs-12 transparent">
                     <p>
-                      BabyPunks are the spawn of what happens when you have a bunch of badass CryptoPunks mixed
-                      with pop culture, internet memes and peyote.This lot are looking for a new home and are up
-                      for adoption.They were originally going to find new homes on Ethereum, but it was too old,
-                      congested and full of other babies who looked neglected.The BabyPunks banded together and
-                      set a course for uncharted territory - Solana.It’s every pixel's dream and now they have
-                      their chance at the big leagues.
+                      BabyPunks are the spawn of what happens when you have a
+                      bunch of badass CryptoPunks mixed with pop culture,
+                      internet memes and peyote.This lot are looking for a new
+                      home and are up for adoption.They were originally going to
+                      find new homes on Ethereum, but it was too old, congested
+                      and full of other babies who looked neglected.The
+                      BabyPunks banded together and set a course for uncharted
+                      territory - Solana.It’s every pixel's dream and now they
+                      have their chance at the big leagues.
                     </p>
                     <p>
-                      All they need is the right person to take them under their wing and teach them the ropes.
-                      These punks may be small but they have big dreams and their properties uniquely reflect who
-                      they are and promise to reward their owners handsomely.
+                      All they need is the right person to take them under their
+                      wing and teach them the ropes. These punks may be small
+                      but they have big dreams and their properties uniquely
+                      reflect who they are and promise to reward their owners
+                      handsomely.
                     </p>
                   </div>
                 </div>
@@ -641,9 +644,7 @@ const Home = (props: HomeProps) => {
             <section id="roadmap">
               <div className="container text-center">
                 <div className="col-md-12 col-sm-12 col-xs-12 mb-4">
-                  <h1>
-                    Roadmap
-                  </h1>
+                  <h1>Roadmap</h1>
                 </div>
               </div>
               <div className="container">
@@ -655,7 +656,10 @@ const Home = (props: HomeProps) => {
                         <div className="road-detail">
                           <h4>20% Sold</h4>
                           <h6 className="red">NFT Giveaway</h6>
-                          <p>A random airdrop of 20 NFTs to early community members in our discord.</p>
+                          <p>
+                            A random airdrop of 20 NFTs to early community
+                            members in our discord.
+                          </p>
                         </div>
                       </div>
                     </div>
@@ -665,8 +669,11 @@ const Home = (props: HomeProps) => {
                         <div className="road-detail">
                           <h4>40% Sold</h4>
                           <h6 className="red">BabyPunks 10x Baby Bonus</h6>
-                          <p>On the 4000th sale, there will be a payout 10x the mint price in SOL to 4
-                            community members in our discord.</p>
+                          <p>
+                            On the 4000th sale, there will be a payout 10x the
+                            mint price in SOL to 4 community members in our
+                            discord.
+                          </p>
                         </div>
                       </div>
                     </div>
@@ -676,9 +683,12 @@ const Home = (props: HomeProps) => {
                         <div className="road-detail">
                           <h4>50% Sold</h4>
                           <h6 className="red">BabyPunks Merch</h6>
-                          <p>BabyPunks Merch store will be rolled out where NFT holders will get first dibs
-                            and exclusive access to limited edition t-shirts, hats, and hoodies.Non-NFT
-                            holders will be given access at a later date.</p>
+                          <p>
+                            BabyPunks Merch store will be rolled out where NFT
+                            holders will get first dibs and exclusive access to
+                            limited edition t-shirts, hats, and hoodies.Non-NFT
+                            holders will be given access at a later date.
+                          </p>
                         </div>
                       </div>
                     </div>
@@ -688,8 +698,10 @@ const Home = (props: HomeProps) => {
                         <div className="road-detail">
                           <h4>60% Sold</h4>
                           <h6 className="red">BabyPunks Sweeper</h6>
-                          <p>A liquidity wallet will be created that will be used to buy the floor of BabyPunk
-                            NFTs.</p>
+                          <p>
+                            A liquidity wallet will be created that will be used
+                            to buy the floor of BabyPunk NFTs.
+                          </p>
                         </div>
                       </div>
                     </div>
@@ -699,10 +711,11 @@ const Home = (props: HomeProps) => {
                         <div className="road-detail">
                           <h4>70% Sold</h4>
                           <h6 className="red">BabyPunks Gives Back</h6>
-                          <p>The community will direct a $10,000 gift to a charity of the community's
-                            choosing.
-                            A grant of $15,000 will be set up to fund a community project that contributes
-                            to the growth of BabyPunks.
+                          <p>
+                            The community will direct a $10,000 gift to a
+                            charity of the community's choosing. A grant of
+                            $15,000 will be set up to fund a community project
+                            that contributes to the growth of BabyPunks.
                           </p>
                         </div>
                       </div>
@@ -713,8 +726,10 @@ const Home = (props: HomeProps) => {
                         <div className="road-detail">
                           <h4>80% Sold</h4>
                           <h6 className="red">TeenPunks</h6>
-                          <p>We will create a limited collection of stylized TeenPunks and airdrop them to all
-                            holders.</p>
+                          <p>
+                            We will create a limited collection of stylized
+                            TeenPunks and airdrop them to all holders.
+                          </p>
                         </div>
                       </div>
                     </div>
@@ -724,11 +739,16 @@ const Home = (props: HomeProps) => {
                         <div className="road-detail">
                           <h4>100% Sold</h4>
                           <h6 className="red">The PUNK-A-TRON Arcade</h6>
-                          <p>We will build an even bigger arcade than we planned for previously that will host
-                            approximately 10 titles by the end of this year.The games will feature retro
-                            old school classics.All NFT holders will be able to stake their NFTs to earn
-                            BabyPunk Tokens from transaction fees paid by players to play the games to
-                            compete head to head for prizes such popular NFTs, and SOL tokens.</p>
+                          <p>
+                            We will build an even bigger arcade than we planned
+                            for previously that will host approximately 10
+                            titles by the end of this year.The games will
+                            feature retro old school classics.All NFT holders
+                            will be able to stake their NFTs to earn BabyPunk
+                            Tokens from transaction fees paid by players to play
+                            the games to compete head to head for prizes such
+                            popular NFTs, and SOL tokens.
+                          </p>
                         </div>
                       </div>
                     </div>
@@ -743,52 +763,39 @@ const Home = (props: HomeProps) => {
               <div id="team" className="container text-center">
                 <div className="row">
                   <div className="col-lg-12 col-sm-12 col-xs-12 mb-5">
-                    <h1>
-                      The Team
-                    </h1>
+                    <h1>The Team</h1>
                   </div>
                 </div>
                 <div className="row">
                   <div className="col-lg-3 col-sm-6 col-xs-12">
                     <img src="http://babypunks.com/img/baby_3.png" alt="dev" />
-                    <p>
-                      BabyPunkGuy
-                    </p>
-                    <p>
-                      Dev
-                    </p>
+                    <p>BabyPunkGuy</p>
+                    <p>Dev</p>
                   </div>
                   <div className="col-lg-3 col-sm-6 col-xs-12">
-                    <img src="http://babypunks.com/img/baby_5.png" alt="smmark" />
-                    <p>
-                      Nefu
-                    </p>
-                    <p>
-                      Social Media Marketing
-                    </p>
+                    <img
+                      src="http://babypunks.com/img/baby_5.png"
+                      alt="smmark"
+                    />
+                    <p>Nefu</p>
+                    <p>Social Media Marketing</p>
                   </div>
                   <div className="col-lg-3 col-sm-6 col-xs-12">
                     <img src="http://babypunks.com/img/baby_7.png" alt="man" />
-                    <p>
-                      SK
-                    </p>
-                    <p>
-                      Project Management
-                    </p>
+                    <p>SK</p>
+                    <p>Project Management</p>
                   </div>
                   <div className="col-lg-3 col-sm-6 col-xs-12">
-                    <img src="http://babypunks.com/img/baby_8.png" alt="marks" />
-                    <p>
-                      CaptainM00n
-                    </p>
-                    <p>
-                      Marketing Strategy
-                    </p>
+                    <img
+                      src="http://babypunks.com/img/baby_8.png"
+                      alt="marks"
+                    />
+                    <p>CaptainM00n</p>
+                    <p>Marketing Strategy</p>
                   </div>
                 </div>
               </div>
             </section>
-
           </div>
           <section className="backgroundGradient">
             <div id="team" className="container text-center backgroundGradient">

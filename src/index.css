@@ -23,13 +23,23 @@ body {
 
 }
 
+.nav-link:hover {
+	color: #ffba00 !important;
+}
+.nav-item:hover {
+	color: #ffba00 !important;
+}
+.dropdown-item:hover {
+	color: #ffba00 !important;
+}
+
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
     monospace;
 }
 
 .team1 {
-  background-image: url("assets/baby_3.png")
+  background-image: url("assets/img/baby_3.png")
 }
 
 .storyImage {
@@ -119,7 +129,6 @@ h3 {
 /*-- New CSS --*/
 
 .road-content{
-  height: 210px;
   border-left: 2px solid hsla(0,0%,100%,.3);
   position: relative;
   margin-bottom: 60px;

@@ -27,6 +27,7 @@ h5,
 h6 {
   color: #ffa616;
   font-family: "PressStart2P-Regular", Fallback, sans-serif !important;
+  line-height: 3rem;
 }
 
 .MuiInput-input,
@@ -258,11 +259,15 @@ ul ol {
 }
 
 a {
-  text-decoration: none;
-  color: #c3c9d4;
-  transition: all 0.3s linear;
-  background-color: transparent;
-  font-family: "PressStart2P-Regular", Fallback, sans-serif;
+  text-decoration: none !important;
+  color: whitesmoke !important;
+  transition: all 0.3s linear !important;
+  background-color: transparent !important;
+  font-family: "PressStart2P-Regular", Fallback, sans-serif !important;
+}
+
+a:hover {
+  color:#ffa616;
 }
 
 .main-section {
@@ -283,4 +288,33 @@ a {
   border: none;
   background-color: transparent;
   cursor: pointer;
+}
+
+.countHour, .countMin, .countSec {
+  border: 2px solid whitesmoke;
+  border-radius: 10px;
+  font-size: 2rem;
+  color: whitesmoke;
+  font-family: "PressStart2P-Regular", Fallback, sans-serif;
+  padding: 1rem;
+}
+.dropdown-menu {
+  background-color: #2a2e37;
+}
+
+@media only screen and (max-width: 991px) {
+  .timer {
+    padding: 0 25%;
+  }
+  .navbar {
+    background-color: #2a2e37;
+    box-shadow: 15px 0 40px 0 rgb(0 0 0 / 50%);
+  }
+}
+.navbar {
+  width: 100%;
+}
+.navbar-nav {
+  width: 100%;
+  justify-content: space-around;
 }

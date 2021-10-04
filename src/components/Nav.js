@@ -18,12 +18,12 @@ const Nav = () => {
       <div className="container">
         <div className="header-content-wrapper">
           <a href="/" className="site-logo" title="back to index">
-            {/* <img
+            <img
               loading="lazy"
               width="200"
-              src="http://babypunks.com/img/logo-primary.png"
+              src="../assets/img/logo-primary.png"
               alt="babypunks"
-            /> */}
+            />
           </a>
 
           <nav>

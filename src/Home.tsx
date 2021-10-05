@@ -262,15 +262,13 @@ const Home = (props: HomeProps) => {
 
 
     const distance =
-        new Date("Oct 8, 2021 00:00:00").getTime() - new Date().getTime();
-    const hours =
-        Math.floor(distance / (1000 * 60 * 60 * 24)) * 24 +
-        Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        new Date(Date.UTC(2021,9,8,21)).getTime() - new Date(Date.now()).getTime();
+    const hours = Math.floor((distance / (1000 * 60 * 60)) % 24);
     const hoursMinSecs = {
-        days: hours / 24,
+        days: Math.floor(distance / (1000 * 60 * 60 * 24)),
         hours: hours,
-        minutes: Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60)),
-        seconds: Math.floor((distance % (1000 * 60)) / 1000),
+        minutes: Math.floor((distance / 1000 / 60) % 60),
+        seconds: Math.floor((distance / 1000) % 60),
     };
 
     // let random = random1;
@@ -288,7 +286,7 @@ const Home = (props: HomeProps) => {
                             id="ramdomBaby"
                             loading="lazy"
                             src="https://s3.eu-central-1.wasabisys.com/steleros/gif_2.gif"
-                            style={{borderRadius: "16px", width: "400px", height: "400px"}}
+                            style={{borderRadius: "16px", width: "350px", height: "350px"}}
                             alt="header"
                         />
 
@@ -316,11 +314,11 @@ const Home = (props: HomeProps) => {
                                 <CircularProgress/>
                             ) : (
                                 <img
-
+                                    onClick={wallet ? onMint : connectButtonClick}
                                     className="randomImage"
                                     loading="lazy"
                                     id="random"
-                                    style={{cursor: "pointer"}}
+                                    style={{cursor: "pointer", width: "179px", height: "77px"}}
                                     src={pixelBtn}
                                     alt="random nft"
                                 />

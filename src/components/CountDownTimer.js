@@ -20,8 +20,7 @@ const CountDownTimer = ({hoursMinSecs}) => {
             setTime([dys, hrs, mins, secs - 1]);
         }
     };
-
-
+    
     const reset = () => setTime([parseInt(days), parseInt(hours), parseInt(minutes), parseInt(seconds)]);
 
 
@@ -39,7 +38,7 @@ const CountDownTimer = ({hoursMinSecs}) => {
                     <p>Days</p>
                 </div>
                 <div className="col-lg-2 col-sm-12 col-xs-12 timer mx-auto">
-                    <div className="countHour">{`${(3 % hrs).toString().padStart(2, '0')}`}</div>
+                    <div className="countHour">{`${hrs.toString().padStart(2, '0')}`}</div>
                     <p>Hours</p>
                 </div>
                 <div className="col-lg-2 col-sm-12 col-xs-12 timer mx-auto">

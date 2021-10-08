@@ -33,35 +33,15 @@ import baby9 from "./assets/img/baby_9.png";
 import baby13 from "./assets/img/baby_13.png";
 import baby14 from "./assets/img/random/21.png";
 import baby15 from "./assets/img/random/14.png";
-import random1 from "./assets/img/random/1.png";
 import pdf1 from "./pdf/WP3.pdf";
 import pdf2 from "./pdf/Audit.pdf";
 
-// import random2 from "./assets/img/random/2.png";
-// import random3 from "./assets/img/random/3.png";
-// import random4 from "./assets/img/random/4.png";
-// import random5 from "./assets/img/random/5.png";
-// import random6 from "./assets/img/random/6.png";
-// import random7 from "./assets/img/random/7.png";
-// import random8 from "./assets/img/random/8.png";
-// import random9 from "./assets/img/random/9.png";
-// import random10 from "./assets/img/random/10.png";
-// import random11 from "./assets/img/random/11.png";
-// import random12 from "./assets/img/random/12.png";
-// import random13 from "./assets/img/random/13.png";
-// import random14 from "./assets/img/random/14.png";
 
 import babyIlustration from "./assets/img/baby_illustration.png";
 import banner2 from "./assets/img/banner2.png";
 import pixelBtn from "./assets/img/pixel_button.png";
 
-// const ConnectButton = styled(WalletDialogButton)``;
-
-// const CounterText = styled.span``; // add your styles here
-
-// const MintButton = styled(Button)``; // add your styles here
-
-const MintContainer = styled.div``; // add your styles here
+const MintContainer = styled.div``;
 
 export interface HomeProps {
     candyMachineId: anchor.web3.PublicKey;
@@ -74,26 +54,60 @@ export interface HomeProps {
 
 let subtitle: any;
 
-// const ComponentDidMount = () => {};
-
 const Home = (props: HomeProps) => {
     const [balance, setBalance] = useState<number>();
     // const [isActive, setIsActive] = useState(false); // true when countdown completes
     const [isSoldOut, setIsSoldOut] = useState(false); // true when items remaining is zero
     const [isMinting, setIsMinting] = useState(false); // true when user got to press MINT
-    const [mintNumber, setMintNumber] = useState([] as any);
-    const defaultMintingNumber = 1;
+    const [mintNumber, setMintNumber] = useState(1);
+    const [mintedNumber, setMintedNumber] = useState(1);
     const [alertState, setAlertState] = useState<AlertState>({
         open: false,
         message: "",
         severity: undefined,
     });
 
-    // let selectedValue = " ";
-
     let wallet = useAnchorWallet();
 
-    // const handleConnected = () => {};
+
+    const [itemsAvailable, setItemsAvailable] = useState(0);
+    const [itemsRedeemed, setItemsRedeemed] = useState(0);
+    const [itemsRemaining, setItemsRemaining] = useState(0);
+
+
+    const refreshCandyMachineState = () => {
+        (async () => {
+            if (!wallet) return;
+
+            const {
+                candyMachine,
+                goLiveDate,
+                itemsAvailable,
+                itemsRemaining,
+                itemsRedeemed,
+            } = await getCandyMachineState(
+                wallet as anchor.Wallet,
+                props.candyMachineId,
+                props.connection
+            );
+
+            setItemsAvailable(itemsAvailable);
+            setItemsRemaining(itemsRemaining);
+            setItemsRedeemed(itemsRedeemed);
+
+
+            setIsSoldOut(itemsRemaining === 0);
+            setStartDate(goLiveDate);
+            setCandyMachine(candyMachine);
+        })();
+    };
+
+    useEffect(refreshCandyMachineState, [
+        wallet,
+        props.candyMachineId,
+        props.connection,
+    ]);
+
 
     const [startDate, setStartDate] = useState(new Date(props.startDate));
 
@@ -118,87 +132,78 @@ const Home = (props: HomeProps) => {
         setIsOpen(false);
     }
 
-    const onMints = async (num: Number) => {
-        num = 20;
-        for (let index = 0; index < num; index++) {
-            await onMint();
-        }
-    }
-
     const onMint = async () => {
-        try {
-            setIsMinting(true);
-            if (wallet && candyMachine?.program) {
-                let v = document.getElementById("mintamount");
+        for (let index = 0; index < mintNumber; index++) {
+            setMintedNumber(index + 1);
+            try {
+                setIsMinting(true);
+                if (wallet && candyMachine?.program) {
 
-                if (v) {
-                    const l = document.getElementById("mintamount")?.innerText;
-                    console.log(l);
+                    const mintTxId = await mintOneToken(
+                        candyMachine,
+                        props.config,
+                        wallet.publicKey,
+                        props.treasury,
+                        1
+                    );
+
+                    const status = await awaitTransactionSignatureConfirmation(
+                        mintTxId,
+                        props.txTimeout,
+                        props.connection,
+                        "singleGossip",
+                        false
+                    );
+
+                    if (!status?.err) {
+                        setAlertState({
+                            open: true,
+                            message: "Congratulations! Mint succeeded!",
+                            severity: "success",
+                        });
+
+                        refreshCandyMachineState();
+                    } else {
+                        setAlertState({
+                            open: true,
+                            message: "Mint failed!! Please try again!",
+                            severity: "error",
+                        });
+                    }
                 }
+            } catch (error: any) {
 
-                console.log("mintNumber");
-                console.log(mintNumber);
 
-                const mintTxId = await mintOneToken(
-                    candyMachine,
-                    props.config,
-                    wallet.publicKey,
-                    props.treasury,
-                    mintNumber
-                );
-
-                const status = await awaitTransactionSignatureConfirmation(
-                    mintTxId,
-                    props.txTimeout,
-                    props.connection,
-                    "singleGossip",
-                    false
-                );
-
-                if (!status?.err) {
-                    setAlertState({
-                        open: true,
-                        message: "Congratulations! Mint succeeded!",
-                        severity: "success",
-                    });
+                // TODO: blech:
+                let message = error.message || "Minting failed! Please try again!";
+                if (!error.msg) {
+                    if (error.message.indexOf("0x138")) {
+                    } else if (error.message.indexOf("0x137")) {
+                        message = `SOLD OUT!`;
+                    } else if (error.message.indexOf("0x135")) {
+                        message = `Insufficient funds to mint. Please fund your wallet.`;
+                    }
                 } else {
-                    setAlertState({
-                        open: true,
-                        message: "Mint failed!! Please try again!",
-                        severity: "error",
-                    });
+                    if (error.code === 311) {
+                        message = `SOLD OUT!`;
+                        setIsSoldOut(true);
+                    } else if (error.code === 312) {
+                        message = `Minting period hasn't started yet.`;
+                    }
                 }
-            }
-        } catch (error: any) {
-            // TODO: blech:
-            let message = error.msg || "Minting failed! Please try again!";
-            if (!error.msg) {
-                if (error.message.indexOf("0x138")) {
-                } else if (error.message.indexOf("0x137")) {
-                    message = `SOLD OUT!`;
-                } else if (error.message.indexOf("0x135")) {
-                    message = `Insufficient funds to mint. Please fund your wallet.`;
-                }
-            } else {
-                if (error.code === 311) {
-                    message = `SOLD OUT!`;
-                    setIsSoldOut(true);
-                } else if (error.code === 312) {
-                    message = `Minting period hasn't started yet.`;
-                }
-            }
 
-            setAlertState({
-                open: true,
-                message,
-                severity: "error",
-            });
-        } finally {
-            if (wallet) {
-                const balance = await props.connection.getBalance(wallet.publicKey);
-                setBalance(balance / LAMPORTS_PER_SOL);
+                setAlertState({
+                    open: true,
+                    message,
+                    severity: "error",
+                });
+            } finally {
+                if (wallet) {
+                    const balance = await props.connection.getBalance(wallet.publicKey);
+                    setBalance(balance / LAMPORTS_PER_SOL);
+                }
+                setIsMinting(false);
             }
-            setIsMinting(false);
         }
     };
 
@@ -243,7 +248,9 @@ const Home = (props: HomeProps) => {
     window.addEventListener("scroll", changeNavbarColor);
 
     const [open, setOpen] = React.useState(false);
+
     const handleClickOpen = () => {
+        refreshCandyMachineState();
         setOpen(true);
     };
 
@@ -260,9 +267,8 @@ const Home = (props: HomeProps) => {
     */
 
 
-
     const distance =
-        new Date(Date.UTC(2021,9,8,21)).getTime() - new Date(Date.now()).getTime();
+        new Date(Date.UTC(2021, 9, 8, 21)).getTime() - new Date(Date.now()).getTime();
     const hours = Math.floor((distance / (1000 * 60 * 60)) % 24);
     const hoursMinSecs = {
         days: Math.floor(distance / (1000 * 60 * 60 * 24)),
@@ -279,9 +285,20 @@ const Home = (props: HomeProps) => {
     return (
         <main>
             <div>
-                <Dialog className="text-center" open={open} onClose={handleClose}>
+                <Dialog className="text-center" open={open} onClose={handleClose} PaperProps={{
+                    style: {
+                        backgroundColor: '#b84185',
+                    },
+                }}>
                     <DialogTitle>Mint Ramdom NFT</DialogTitle>
                     <DialogContent>
+
+                        {wallet && <p>Balance: {(balance || 0).toLocaleString()} SOL</p>}
+
+                        {wallet && <p>Minted: {itemsRedeemed} / {itemsAvailable}</p>}
+
+                        {wallet && <p>Remaining: {itemsRemaining}</p>}
+
                         <img
                             id="ramdomBaby"
                             loading="lazy"
@@ -306,12 +323,25 @@ const Home = (props: HomeProps) => {
                             variant="standard"
                             value={mintNumber}
 
-                            onChange={(e) => setMintNumber(e.target.value)}
+                            onChange={(e) => setMintNumber(Number(e.target.value))}
                         />
+                        <span style={{fontSize: "8px", color: "white"}}>NOTE: Enable auto approve for mint more than one NFT at same time</span>
 
-                        <div>
+                        <div style={{marginTop: "0.5rem"}}>
                             {isMinting ? (
-                                <CircularProgress/>
+                                <div style={{
+                                    display: "flex",
+                                    flexDirection: "column",
+                                    alignContent: "center",
+                                    justifyContent: "center"
+                                }}>
+                                    <div>
+                                        <span style={{fontSize: "12px"}}>Minting {mintedNumber} of {mintNumber}</span>
+                                    </div>
+                                    <div>
+                                        <CircularProgress/>
+                                    </div>
+                                </div>
                             ) : (
                                 <img
                                     onClick={wallet ? onMint : connectButtonClick}
@@ -427,7 +457,7 @@ const Home = (props: HomeProps) => {
                                                     >
                                                         Buy
                                                     </a>
-                                                   <ul
+                                                    <ul
                                                         className="dropdown-menu"
                                                         aria-labelledby="navbarDropdownMenuLink"
                                                     >
@@ -592,8 +622,8 @@ const Home = (props: HomeProps) => {
                                                         aria-labelledby="navbarDropdownMenuLink">
                                                         <li>
                                                             <a href="mailto:info@babypunks.com"
-                                                                aria-label="Contact"
-                                                                className="dropdown-item"
+                                                               aria-label="Contact"
+                                                               className="dropdown-item"
                                                             >
                                                                 info@babypunks.com
                                                             </a>
@@ -601,7 +631,8 @@ const Home = (props: HomeProps) => {
                                                     </ul>
                                                 </li>
                                                 <li className="nav-item">
-                                                    {!wallet && <WalletMultiButton id="connectButton"></WalletMultiButton>}
+                                                    {!wallet &&
+                                                    <WalletMultiButton id="connectButton"></WalletMultiButton>}
                                                     {wallet && <WalletDisconnectButton/>}
                                                 </li>
                                             </ul>
